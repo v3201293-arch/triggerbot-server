@@ -1,23 +1,21 @@
-# server.py - ИСПРАВЛЕННАЯ ВЕРСИЯ (ключ 32 байта)
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import sqlite3
 import datetime
 import hashlib
 import os
+import base64
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
-import base64
 
 app = Flask(__name__)
 CORS(app)
 
 # === НАСТРОЙКИ ===
 DB_PATH = 'licenses.db'
-SECRET_KEY = b'MySecretKeyForAES256Encryption32'  # ИСПРАВЛЕНО: убрал ! в конце
+SECRET_KEY = b'MySecretKeyForAES256Encryption32'
 MAIN_PY_ENCRYPTED = None
 
-# === ФУНКЦИИ БАЗЫ ДАННЫХ ===
 def init_db():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
@@ -38,13 +36,12 @@ def init_db():
 def load_encrypted_main():
     global MAIN_PY_ENCRYPTED
     if os.path.exists('main_encrypted.bin'):
-        with open('main_encrypted.bin', 'r') as f:
-            MAIN_PY_ENCRYPTED = f.read()
+        with open('main_encrypted.bin', 'rb') as f:
+            MAIN_PY_ENCRYPTED = f.read().decode('utf-8')
         print("Зашифрованный main.py загружен")
     else:
         print("ВНИМАНИЕ: main_encrypted.bin не найден!")
 
-# === API ЭНДПОИНТЫ ===
 @app.route('/verify', methods=['POST'])
 def verify_key():
     data = request.get_json()
@@ -87,7 +84,6 @@ def verify_key():
     conn.close()
     return jsonify({'success': False, 'error': 'Ключ активирован на другом устройстве'})
 
-# === ЗАПУСК ===
 if __name__ == '__main__':
     init_db()
     load_encrypted_main()
