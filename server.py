@@ -36,8 +36,8 @@ def init_db():
 def load_encrypted_main():
     global MAIN_PY_ENCRYPTED
     if os.path.exists('main_encrypted.bin'):
-        with open('main_encrypted.bin', 'rb') as f:
-            MAIN_PY_ENCRYPTED = f.read().decode('utf-8')
+        with open('main_encrypted.bin', 'r', encoding='utf-8') as f:
+            MAIN_PY_ENCRYPTED = f.read()
         print("Зашифрованный main.py загружен")
     else:
         print("ВНИМАНИЕ: main_encrypted.bin не найден!")
